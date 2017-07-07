@@ -1,13 +1,14 @@
 Host *
      StrictHostKeyChecking no
      UserKnownHostsFile=/dev/null
+     ServerAliveInterval 60
 
 Host one
 Hostname 172.16.1.101
 Port 22
-User Vagrant
+User vagrant
 
 Host two
 Hostname 172.16.1.102
 Port 22
-User Vagrant
+User vagrant
