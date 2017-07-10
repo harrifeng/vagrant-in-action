@@ -18,5 +18,6 @@ Vagrant.configure("2") do |config|
     app.vm.network "public_network", ip: "192.168.0.111", netmask: "255.255.252.0"
     app.vm.provision "file", source: "~/.vagrant.d/insecure_private_key", destination: "~/.ssh/id_rsa"
     app.vm.provision "file", source: "ssh_config", destination: "~/.ssh/config"
+    app.vm.provision "shell", path: "config.sh"
   end
 end
