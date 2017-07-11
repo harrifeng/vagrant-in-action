@@ -1,5 +1,5 @@
 sudo sed -i "s/us/cn/g" /etc/apt/sources.list
-# sudo apt-get update -y
+sudo apt-get update -y
 
 sed -i "/netmask/a dns-nameservers 192.168.0.7" /etc/network/interfaces
 sed -i "/netmask/a gateway 192.168.0.253" /etc/network/interfaces
