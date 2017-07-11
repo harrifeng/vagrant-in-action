@@ -5,4 +5,5 @@ Vagrant is the great way to learn linux
 + install vagrant cachier
 ```
 vagrant plugin install vagrant-cachier
+vagrant plugin install vagrant-triggers
 ```
