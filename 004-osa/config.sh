@@ -12,8 +12,6 @@ bonding
 sudo mkdir -p /root/.ssh
 sudo cp /home/vagrant/.ssh/authorized_keys /root/.ssh/authorized_keys
 
-# sed -i "/netmask/a dns-nameservers 192.168.0.7" /etc/network/interfaces
-# sed -i "/netmask/a gateway 192.168.0.253" /etc/network/interfaces
 sudo cp /home/vagrant/interfaces /etc/network/interfaces
 
 sudo route add default gw 192.168.0.253
