@@ -1,5 +1,8 @@
 ---
 - hosts: all
+
+  vars:
+    systemd_docker_config_directory: /etc/systemd/system/docker.service.d
   tasks:
     - name: Install list of packages
       package:
@@ -40,16 +43,16 @@
         state: latest
     - name: Ensure docker.service directory is existed
       file:
-        path: /etc/systemd/system/docker.service.d
+        path: "{{ systemd_docker_config_directory }}"
         state: directory
     - name: Ensure docker.service.kolla.conf is existed
       copy:
         content: ""
-        dest: /etc/systemd/system/docker.service.d/kolla.conf
+        dest: "{{ systemd_docker_config_directory }}/kolla.conf"
         force: no
     - name: Add config to docker.service.kolla.conf
       lineinfile:
-        dest: /etc/systemd/system/docker.service.d/kolla.conf
+        dest: "{{ systemd_docker_config_directory }}/kolla.conf"
         regexp: "{{ item.regexp }}"
         line: "{{ item.line }}"
       with_items:
