@@ -19,6 +19,7 @@
         - apt-transport-https
         - ca-certificates
         - software-properties-common
+        - ntp
     - name: Install Pip Packages
       pip:
         name: "{{ item }}"
@@ -63,3 +64,7 @@
         state: restarted
         daemon_reload: yes
         name: docker
+    - name: Make sure ntp is running
+      systemd:
+        state: started
+        name: ntp
