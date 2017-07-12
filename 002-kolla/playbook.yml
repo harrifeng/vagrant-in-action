@@ -42,3 +42,7 @@
       file:
         path: /etc/systemd/system/docker.service.d
         state: directory
+    - name: Ensure docker.service.killa.conf is existed
+      file:
+        path: /etc/systemd/system/docker.service.d/kolla.conf
+        state: touch
