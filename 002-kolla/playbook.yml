@@ -23,6 +23,8 @@
       with_items:
         - pip
         - ansible
+        - docker-py
+        - kolla-ansible
     - name: Ensure repository key is installed
       apt_key:
         id: "0EBFCD88"
@@ -36,3 +38,7 @@
       package:
         name: "docker-ce"
         state: latest
+    - name: Ensure docker.service directory is existed
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
