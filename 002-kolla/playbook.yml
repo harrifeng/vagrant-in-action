@@ -42,7 +42,16 @@
       file:
         path: /etc/systemd/system/docker.service.d
         state: directory
-    - name: Ensure docker.service.killa.conf is existed
-      file:
-        path: /etc/systemd/system/docker.service.d/kolla.conf
-        state: touch
+    - name: Ensure docker.service.kolla.conf is existed
+      copy:
+        content: ""
+        dest: /etc/systemd/system/docker.service.d/kolla.conf
+        force: no
+    - name: Add config to docker.service.kolla.conf
+      lineinfile:
+        dest: /etc/systemd/system/docker.service.d/kolla.conf
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '\[Service\]', line: "[Service]"}
+        - { regexp: "MountFlags=shared", line: "MountFlags=shared"}
