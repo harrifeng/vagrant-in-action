@@ -1,14 +1,22 @@
 ---
 - hosts: all
   tasks:
-    - name: Use cn Ubuntu mirror
-      replace:
-        path: /etc/apt/sources.list
-        regexp: 'us'
-        replace: 'cn'
     - name: Install list of packages
       package:
         name: "{{ item }}"
         state: latest
       with_items:
         - python-pip
+        - python-dev
+        - libffi-dev
+        - gcc
+        - libssl-dev
+        - traceroute
+        - curl
+    - name: Install Pip Packages
+      pip:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - pip
+        - ansible
