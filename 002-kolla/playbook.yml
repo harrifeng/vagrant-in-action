@@ -1,6 +1,11 @@
 ---
 - hosts: all
   tasks:
+    - name: Use cn Ubuntu mirror
+      replace:
+        path: /etc/apt/sources.list
+        regexp: 'us'
+        replace: 'cn'
     - name: Install list of packages
       package:
         name: "{{ item }}"
