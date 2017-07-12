@@ -82,12 +82,12 @@
       lineinfile:
         path: /etc/kolla/globals.yml
         regexp: '^network_interface'
-        line: 'network_interface=enp0s8'
+        line: 'network_interface: "enp0s8"'
     - name: replace neutron_external_interface
       lineinfile:
         path: /etc/kolla/globals.yml
         regexp: '^neutron_external_interface'
-        line: 'neutron_external_interface=enp0s9'
+        line: 'neutron_external_interface: "enp0s9"'
     - name: Debug info
       debug:
         msg: "{{ ansible_interfaces }}"
