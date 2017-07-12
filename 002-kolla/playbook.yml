@@ -58,3 +58,8 @@
       with_items:
         - { regexp: '\[Service\]', line: "[Service]"}
         - { regexp: "MountFlags=shared", line: "MountFlags=shared"}
+    - name: Restart docker systemd
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: docker
