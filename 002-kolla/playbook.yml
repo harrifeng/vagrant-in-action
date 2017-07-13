@@ -28,6 +28,7 @@
         - pip
         - ansible
         - docker-py
+        - python-openstackclient
     - name: Ensure repository key is installed
       apt_key:
         id: "0EBFCD88"
