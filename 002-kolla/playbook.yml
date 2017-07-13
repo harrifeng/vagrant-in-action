@@ -46,20 +46,17 @@
       file:
         path: "{{ systemd_docker_config_directory }}"
         state: directory
-    - name: Ensure docker.service.kolla.conf is existed
-      copy:
-        content: ""
+    - name: Ensure kolla.conf had contents
+      template:
+        src: kolla.conf.j2
         dest: "{{ systemd_docker_config_directory }}/kolla.conf"
         force: no
-    - name: Add config to docker.service.kolla.conf
-      lineinfile:
-        dest: "{{ systemd_docker_config_directory }}/kolla.conf"
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-      with_items:
-        - { regexp: '\[Service\]', line: "[Service]"}
-        - { regexp: "MountFlags=shared", line: "MountFlags=shared"}
-    - name: Restart docker systemd
+    - name: Ensure docker.json had contents
+      template:
+        src: daemon.json.j2
+        dest: /etc/docker/daemon.json
+        force: no
+    - name: Restart docker systemd to take effect
       systemd:
         state: restarted
         daemon_reload: yes
@@ -83,12 +80,12 @@
       lineinfile:
         path: /etc/kolla/globals.yml
         regexp: '^network_interface'
-        line: 'network_interface: "enp0s8"'
+        line: 'network_interface: "enp0s3"'
     - name: replace neutron_external_interface
       lineinfile:
         path: /etc/kolla/globals.yml
         regexp: '^neutron_external_interface'
-        line: 'neutron_external_interface: "enp0s9"'
+        line: 'neutron_external_interface: "enp0s8"'
     - name: Debug info
       debug:
         msg: "{{ ansible_interfaces }}"
