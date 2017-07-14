@@ -61,6 +61,43 @@
         state: restarted
         daemon_reload: yes
         name: docker
+    - name: Make sure the kolla images are present
+      docker_image:
+        state: present
+        name: "kolla/{{ item }}"
+        tag: 4.0.0
+      with_items:
+        - centos-binary-neutron-server
+        - centos-binary-nova-compute
+        - centos-binary-neutron-openvswitch-agent
+        - centos-binary-neutron-metadata-agent
+        - centos-binary-heat-api
+        - centos-binary-neutron-dhcp-agent
+        - centos-binary-neutron-l3-agent
+        - centos-binary-heat-api-cfn
+        - centos-binary-nova-ssh
+        - centos-binary-nova-placement-api
+        - centos-binary-nova-conductor
+        - centos-binary-nova-api
+        - centos-binary-nova-consoleauth
+        - centos-binary-nova-scheduler
+        - centos-binary-nova-novncproxy
+        - centos-binary-kolla-toolbox
+        - centos-binary-keystone
+        - centos-binary-glance-registry
+        - centos-binary-horizon
+        - centos-binary-haproxy
+        - centos-binary-cron
+        - centos-binary-openvswitch-db-server
+        - centos-binary-heat-engine
+        - centos-binary-glance-api
+        - centos-binary-fluentd
+        - centos-binary-nova-libvirt
+        - centos-binary-openvswitch-vswitchd
+        - centos-binary-memcached
+        - centos-binary-rabbitmq
+        - centos-binary-mariadb
+        - centos-binary-keepalived
     - name: Make sure ntp is running
       systemd:
         state: started
