@@ -7,8 +7,8 @@ Vagrant.configure("2") do |config|
     vb.cpus = 10
   end
 
-  config.vm.define "0-116-infra" do |app|
-    app.vm.hostname = "0-116-infra"
+  config.vm.define "0-230-infra" do |app|
+    app.vm.hostname = "0-230-infra"
     app.vm.box = "hfengbento/ubuntu-16.04"
     app.vm.box_check_update = false
     app.ssh.insert_key = false
