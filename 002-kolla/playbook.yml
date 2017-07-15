@@ -115,13 +115,12 @@
       pip:
         name: kolla-ansible
         version: 4.0.0
-    - name: Copy the file from kolla ansible
-      stat:
+    - name: Make sure etc kolla folder exists
+      file:
         path: /etc/kolla/
-      register: kd
+        state: directory
     - name: Crete /etc/kolla/ from kolla-ansible
-      shell: cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc/kolla/
-      when: kd.stat.exists == False
+      shell: cp /usr/local/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
     - name: replace network_interface
       lineinfile:
         path: /etc/kolla/globals.yml
