@@ -137,21 +137,15 @@
       shell: |
         cp -r /usr/local/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
         cp -r /usr/local/share/kolla-ansible/ansible/inventory/* /root/inventory/
-    - name: replace network_interface
+    - name: Modify /etc/kolla/globals.yml
       lineinfile:
         path: /etc/kolla/globals.yml
-        regexp: '^network_interface'
-        line: 'network_interface: "{{ network_interface }}"'
-    - name: replace neutron_external_interface
-      lineinfile:
-        path: /etc/kolla/globals.yml
-        regexp: '^neutron_external_interface'
-        line: 'neutron_external_interface: "{{ neutron_external_interface }}"'
-    - name: replace vip interface
-      lineinfile:
-        path: /etc/kolla/globals.yml
-        regexp: '^kolla_internal_vip_address'
-        line: 'kolla_internal_vip_address: "{{ kolla_internal_vip_address }}"'
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^network_interface',          line: 'network_interface:          "{{ network_interface          }}"'}
+        - { regexp: '^neutron_external_interface', line: 'neutron_external_interface: "{{ neutron_external_interface }}"'}
+        - { regexp: '^kolla_internal_vip_address', line: 'kolla_internal_vip_address: "{{ kolla_internal_vip_address }}"'}
     - name: Debug info
       debug:
         msg: "{{ ansible_interfaces }}"
