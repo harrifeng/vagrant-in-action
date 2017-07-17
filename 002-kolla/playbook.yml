@@ -126,12 +126,17 @@
       pip:
         name: kolla-ansible
         version: 4.0.0
-    - name: Ensure the ect kolla folder exists
+    - name: Ensure the target folder existed
       file:
-        path: /etc/kolla
+        path: "{{ item }}"
         state: directory
-    - name: Get /etc/kolla/ contents from kolla-ansible example
-      shell: cp -r /usr/local/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
+      with_items:
+        - /etc/kolla
+        - /root/inventory
+    - name: Get contents from /usr/local/share/kolla-ansible
+      shell: |
+        cp -r /usr/local/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
+        cp -r /usr/local/share/kolla-ansible/ansible/inventory/* /root/inventory/
     - name: replace network_interface
       lineinfile:
         path: /etc/kolla/globals.yml
