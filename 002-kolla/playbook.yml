@@ -158,6 +158,8 @@
         - { regexp: '^EXT_NET_CIDR',    line: 'EXT_NET_CIDR="{{    ext_net_cidr    }}"'}
         - { regexp: '^EXT_NET_RANGE',   line: 'EXT_NET_RANGE="{{   ext_net_range   }}"'}
         - { regexp: '^EXT_NET_GATEWAY', line: 'EXT_NET_GATEWAY="{{ ext_net_gateway }}"'}
-    - name: Debug info
-      debug:
-        msg: "{{ ansible_interfaces }}"
+    - name: Modify /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: "^10.10.10.101    kolla-infra"
+        line: "10.10.10.101    kolla-infra"
