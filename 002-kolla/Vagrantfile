@@ -3,12 +3,12 @@ require './vagrant-provision-reboot-plugin'
 Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
-    vb.memory = "20480"
+    vb.memory = "8192"
     vb.cpus = 4
   end
 
-  config.vm.define "0-230-infra" do |app|
-    app.vm.hostname = "0-230-infra"
+  config.vm.define "kolla-infra" do |app|
+    app.vm.hostname = "kolla-infra"
     app.vm.box = "hfengbento/ubuntu-16.04"
     app.vm.box_check_update = false
     app.ssh.insert_key = false
