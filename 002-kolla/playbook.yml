@@ -4,6 +4,9 @@
 
   vars:
     systemd_docker_config_directory: /etc/systemd/system/docker.service.d
+    network_interface: enp0s8
+    neutron_external_interface: enp0s9
+    kolla_internal_vip_address: 10.10.10.100
   tasks:
     - name: Debug
       debug:
@@ -133,12 +136,17 @@
       lineinfile:
         path: /etc/kolla/globals.yml
         regexp: '^network_interface'
-        line: 'network_interface: "eno1"'
+        line: 'network_interface: "{{ network_interface }}"'
     - name: replace neutron_external_interface
       lineinfile:
         path: /etc/kolla/globals.yml
         regexp: '^neutron_external_interface'
-        line: 'neutron_external_interface: "eno2"'
+        line: 'neutron_external_interface: "{{ neutron_external_interface }}"'
+    - name: replace vip interface
+      lineinfile:
+        path: /etc/kolla/globals.yml
+        regexp: '^kolla_internal_vip_address'
+        line: 'kolla_internal_vip_address: "{{ kolla_internal_vip_address }}"'
     - name: Debug info
       debug:
         msg: "{{ ansible_interfaces }}"
