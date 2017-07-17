@@ -19,16 +19,16 @@
         update_cache: yes
       with_items:
         - python-pip
-        # - python-dev
-        # - libffi-dev
-        # - gcc
-        # - libssl-dev
-        # - traceroute
-        # - curl                  # for docker
-        # - apt-transport-https
-        # - ca-certificates
-        # - software-properties-common
-        # - ntp
+        - python-dev
+        - libffi-dev
+        - gcc
+        - libssl-dev
+        - traceroute
+        - curl                  # for docker
+        - apt-transport-https
+        - ca-certificates
+        - software-properties-common
+        - ntp
     - name: Install Pip Packages
       pip:
         name: "{{ item }}"
