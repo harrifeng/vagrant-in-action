@@ -5,22 +5,30 @@
   vars:
     systemd_docker_config_directory: /etc/systemd/system/docker.service.d
   tasks:
+    - name: Debug
+      debug:
+        msg: date
+    - name: Mirror
+      template:
+        src: sources.list.j2
+        dest: /etc/apt/sources.list
     - name: Install list of packages
-      package:
+      apt:
         name: "{{ item }}"
-        state: latest
+        state: absent
+        update_cache: yes
       with_items:
         - python-pip
-        - python-dev
-        - libffi-dev
-        - gcc
-        - libssl-dev
-        - traceroute
-        - curl                  # for docker
-        - apt-transport-https
-        - ca-certificates
-        - software-properties-common
-        - ntp
+        # - python-dev
+        # - libffi-dev
+        # - gcc
+        # - libssl-dev
+        # - traceroute
+        # - curl                  # for docker
+        # - apt-transport-https
+        # - ca-certificates
+        # - software-properties-common
+        # - ntp
     - name: Install Pip Packages
       pip:
         name: "{{ item }}"
