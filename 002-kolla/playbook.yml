@@ -15,7 +15,7 @@
     - name: Install list of packages
       apt:
         name: "{{ item }}"
-        state: absent
+        state: present
         update_cache: yes
       with_items:
         - python-pip
