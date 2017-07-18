@@ -50,7 +50,7 @@
       register: kolla_hostname
     - name: Display the var
       debug:
-        msg: Hello {{ kolla_hostname.stdout }}
+        msg: Hello {{ ansible_hostname }}
     # - name: Mirror
     #   template:
     #     src: sources.list.j2
@@ -174,5 +174,5 @@
     - name: Modify /etc/hosts
       lineinfile:
         path: /etc/hosts
-        regexp: "^10.10.10.101    {{ kolla_hostname.stdout}}"
-        line: "10.10.10.101    {{ kolla_hostname.stdout}}"
+        regexp: "^{{ ansible_eno1.ipv4.address }}    {{ ansible_hostname }}"
+        line: "{{ ansible_eno1.ipv4.address }}    {{ ansible_hostname }}"
