@@ -50,7 +50,9 @@
       register: kolla_hostname
     - name: Display the var
       debug:
-        msg: Hello {{ ansible_hostname }}
+        # msg: Hello "{{ hostvars['192.168.0.92']['ansible_hostname'] }}"
+        # msg: Hello "{{ vars['ansible_' + {{ neutron_external_interface }} ]}}"
+        msg: Hello {{ vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'] }}
     # - name: Mirror
     #   template:
     #     src: sources.list.j2
