@@ -10,6 +10,39 @@
     ext_net_cidr:    192.168.0.0/22
     ext_net_range:   start=192.168.0.218,end=192.168.0.227
     ext_net_gateway: 192.168.0.253
+    kolla_images:
+      - centos-binary-neutron-server
+      - centos-binary-nova-compute
+      - centos-binary-neutron-openvswitch-agent
+      - centos-binary-neutron-metadata-agent
+      - centos-binary-heat-api
+      - centos-binary-neutron-dhcp-agent
+      - centos-binary-neutron-l3-agent
+      - centos-binary-heat-api-cfn
+      - centos-binary-nova-ssh
+      - centos-binary-nova-placement-api
+      - centos-binary-nova-conductor
+      - centos-binary-nova-api
+      - centos-binary-nova-consoleauth
+      - centos-binary-nova-scheduler
+      - centos-binary-nova-novncproxy
+      - centos-binary-kolla-toolbox
+      - centos-binary-keystone
+      - centos-binary-glance-registry
+      - centos-binary-horizon
+      - centos-binary-haproxy
+      - centos-binary-cron
+      - centos-binary-openvswitch-db-server
+      - centos-binary-heat-engine
+      - centos-binary-glance-api
+      - centos-binary-fluentd
+      - centos-binary-nova-libvirt
+      - centos-binary-openvswitch-vswitchd
+      - centos-binary-memcached
+      - centos-binary-rabbitmq
+      - centos-binary-mariadb
+      - centos-binary-keepalived
+
   tasks:
     - name: Debug
       debug:
@@ -38,7 +71,7 @@
     - name: Install Pip Packages
       pip:
         name: "{{ item }}"
-        state: latest
+        state: present
       with_items:
         - pip
         - ansible
@@ -89,38 +122,11 @@
         state: present
         name: "192.168.1.115:5000/kolla/{{ item }}"
         tag: 4.0.0
-      with_items:
-        - centos-binary-neutron-server
-        - centos-binary-nova-compute
-        - centos-binary-neutron-openvswitch-agent
-        - centos-binary-neutron-metadata-agent
-        - centos-binary-heat-api
-        - centos-binary-neutron-dhcp-agent
-        - centos-binary-neutron-l3-agent
-        - centos-binary-heat-api-cfn
-        - centos-binary-nova-ssh
-        - centos-binary-nova-placement-api
-        - centos-binary-nova-conductor
-        - centos-binary-nova-api
-        - centos-binary-nova-consoleauth
-        - centos-binary-nova-scheduler
-        - centos-binary-nova-novncproxy
-        - centos-binary-kolla-toolbox
-        - centos-binary-keystone
-        - centos-binary-glance-registry
-        - centos-binary-horizon
-        - centos-binary-haproxy
-        - centos-binary-cron
-        - centos-binary-openvswitch-db-server
-        - centos-binary-heat-engine
-        - centos-binary-glance-api
-        - centos-binary-fluentd
-        - centos-binary-nova-libvirt
-        - centos-binary-openvswitch-vswitchd
-        - centos-binary-memcached
-        - centos-binary-rabbitmq
-        - centos-binary-mariadb
-        - centos-binary-keepalived
+      with_items: "{{ kolla_images }}"
+    - name: Rename the private images to public images
+      shell: |
+        docker tag "192.168.1.115:5000/kolla/{{ item }}:4.0.0" "kolla/{{ item }}:4.0.0"
+      with_items: "{{ kolla_images }}"
     - name: Make sure ntp is running
       systemd:
         state: started
