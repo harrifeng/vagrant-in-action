@@ -87,7 +87,7 @@
     - name: Make sure the kolla images are present
       docker_image:
         state: present
-        name: "kolla/{{ item }}"
+        name: "192.168.1.115:5000/kolla/{{ item }}"
         tag: 4.0.0
       with_items:
         - centos-binary-neutron-server
