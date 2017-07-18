@@ -4,8 +4,8 @@
 
   vars:
     systemd_docker_config_directory: /etc/systemd/system/docker.service.d
-    network_interface:          enp0s8
-    neutron_external_interface: enp0s9
+    network_interface:          eno2
+    neutron_external_interface: eno1
     kolla_internal_vip_address: 10.10.10.100
     ext_net_cidr:    192.168.0.0/22
     ext_net_range:   start=192.168.0.218,end=192.168.0.227
