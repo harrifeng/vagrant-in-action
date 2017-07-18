@@ -45,9 +45,9 @@
       - centos-binary-keepalived
 
   tasks:
-    - name: Debug
+    - name: Display the var
       debug:
-        msg: date
+        msg: Hello {{ vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'] }}
     - name: Mirror
       template:
         src: sources.list.j2
@@ -171,5 +171,5 @@
     - name: Modify /etc/hosts
       lineinfile:
         path: /etc/hosts
-        regexp: "^10.10.10.101    kolla-infra"
-        line: "10.10.10.101    kolla-infra"
+        regexp: "^{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
+        line: "{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
