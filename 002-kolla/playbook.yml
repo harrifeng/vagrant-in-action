@@ -10,6 +10,7 @@
     ext_net_cidr:    192.168.0.0/22
     ext_net_range:   start=192.168.0.218,end=192.168.0.227
     ext_net_gateway: 192.168.0.253
+    kolla_version: 4.0.0
     kolla_images:
       - centos-binary-neutron-server
       - centos-binary-nova-compute
@@ -121,11 +122,12 @@
       docker_image:
         state: present
         name: "192.168.1.115:5000/kolla/{{ item }}"
-        tag: 4.0.0
+        tag: "{{ kolla_version }}"
       with_items: "{{ kolla_images }}"
     - name: Rename the private images to public images
       shell: |
-        docker tag "192.168.1.115:5000/kolla/{{ item }}:4.0.0" "kolla/{{ item }}:4.0.0"
+        docker tag "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}" "kolla/{{ item }}:{{ kolla_version }}"
+        docker rmi "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}"
       with_items: "{{ kolla_images }}"
     - name: Make sure ntp is running
       systemd:
@@ -134,7 +136,7 @@
     - name: Install Pip Packages
       pip:
         name: kolla-ansible
-        version: 4.0.0
+        version: "{{ kolla_version }}"
     - name: Ensure the target folder existed
       file:
         path: "{{ item }}"
