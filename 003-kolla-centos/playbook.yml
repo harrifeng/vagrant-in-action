@@ -63,6 +63,7 @@
         - traceroute
         - ca-certificates
         - ntp
+        - libselinux-python
     - name: Install Pip Packages
       pip:
         name: "{{ item }}"
@@ -73,6 +74,13 @@
         - docker
         - docker-py
         - python-openstackclient
+    - name: Diable selinux
+      selinux:
+        state: disabled
+    - name: Make sure firewalld is disabled
+      systemd:
+        state: stopped
+        name: firewalld
     - name: Ensure docker and dependencies are installed
       yum:
         list: "docker-ce"
