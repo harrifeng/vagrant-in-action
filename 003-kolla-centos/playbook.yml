@@ -48,31 +48,31 @@
     - name: Display the var
       debug:
         msg: Hello {{ vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'] }}
-    - name: Install list of packages
-      package:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - epel-release
-        - python-pip
-        - python-devel
-        - libffi-devel
-        - gcc
-        - openssl-devel
-        - libselinux-python
-        - traceroute
-        - ca-certificates
-        - ntp
-    - name: Install Pip Packages
-      pip:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - pip
-        - ansible
-        - docker
-        - docker-py
-        - python-openstackclient
+    # - name: Install list of packages
+    #   package:
+    #     name: "{{ item }}"
+    #     state: present
+    #   with_items:
+    #     - epel-release
+    #     - python-pip
+    #     - python-devel
+    #     - libffi-devel
+    #     - gcc
+    #     - openssl-devel
+    #     - libselinux-python
+    #     - traceroute
+    #     - ca-certificates
+    #     - ntp
+    # - name: Install Pip Packages
+    #   pip:
+    #     name: "{{ item }}"
+    #     state: present
+    #   with_items:
+    #     - pip
+    #     - ansible
+    #     - docker
+    #     - docker-py
+    #     - python-openstackclient
 
     # - name: Ensure repository key is installed
     #   apt_key:
@@ -83,14 +83,22 @@
     #   apt_repository:
     #     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
     #     state: present
+    - name: Ensure docker and dependencies are installed
+      yum:
+        list: "docker-ce"
+      register: pkg
     - name: Install docker rpm from a remote repo
       yum:
         name: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-17.06.0.ce-1.el7.centos.x86_64.rpm
         state: present
-    - name: Ensure docker and dependencies are installed
-      package:
-        name: "docker-ce"
-        state: present
+      when: pkg.results|selectattr("yumstate", "match", "installed")|list|length == 0
+    - name: Debug
+      debug:
+        msg: "{{ pkg }}"
+    - name: Debug two
+      debug:
+        msg: "two"
+      when: pkg.results|selectattr("yumstate", "match", "installed")|list|length == 0
 
     - name: Ensure docker.service directory is existed
       file:
