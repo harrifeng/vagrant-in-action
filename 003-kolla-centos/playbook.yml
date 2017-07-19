@@ -77,10 +77,13 @@
     - name: Diable selinux
       selinux:
         state: disabled
-    - name: Make sure firewalld is disabled
+    - name: Make sure some service is disabled
       systemd:
         state: stopped
-        name: firewalld
+        name: "{{ item }}"
+      with_items:
+        - firewalld
+        - NetworkManager
     - name: Ensure docker and dependencies are installed
       yum:
         list: "docker-ce"
