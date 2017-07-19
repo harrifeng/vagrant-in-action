@@ -123,21 +123,20 @@
         state: restarted
         daemon_reload: yes
         name: docker
-    # - name: Make sure the kolla images are present
-    #   docker_image:
-    #     state: present
-    #     name: "192.168.1.115:5000/kolla/{{ item }}"
-    #     tag: "{{ kolla_version }}"
-    #   with_items: "{{ kolla_images }}"
-    # - name: Rename the private images to public images
-    #   shell: |
-    #     docker tag "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}" "kolla/{{ item }}:{{ kolla_version }}"
-    #     docker rmi "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}"
-    #   with_items: "{{ kolla_images }}"
-    # - name: Make sure ntp is running
-    #   systemd:
-    #     state: started
-    #     name: ntp
+    - name: Make sure the kolla images are present
+      docker_image:
+        state: present
+        name: "192.168.1.115:5000/kolla/{{ item }}"
+        tag: "{{ kolla_version }}"
+      with_items: "{{ kolla_images }}"
+    - name: Rename the private images to public images
+      shell: |
+        docker tag "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}" "kolla/{{ item }}:{{ kolla_version }}"
+      with_items: "{{ kolla_images }}"
+    - name: Make sure ntp is running
+      systemd:
+        state: started
+        name: ntpd
     # - name: Install Pip Packages
     #   pip:
     #     name: kolla-ansible
