@@ -105,14 +105,6 @@
         src: daemon.json.j2
         dest: /etc/docker/daemon.json
         force: no
-    - name: Ensure nova-compute.conf had folder
-      file:
-        path: /etc/kolla/config/nova
-        state: directory
-    - name: Ensure nova-compute.conf had contents
-      template:
-        src: nova-compute.conf.j2
-        dest: /etc/kolla/config/nova/nova-compute.conf
     - name: Restart docker systemd to take effect
       systemd:
         state: restarted
