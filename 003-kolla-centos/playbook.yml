@@ -137,43 +137,43 @@
       systemd:
         state: started
         name: ntpd
-    # - name: Install Pip Packages
-    #   pip:
-    #     name: kolla-ansible
-    #     version: "{{ kolla_version }}"
-    # - name: Ensure the target folder existed
-    #   file:
-    #     path: "{{ item }}"
-    #     state: directory
-    #   with_items:
-    #     - /etc/kolla
-    #     - /root/inventory
-    # - name: Get contents from /usr/local/share/kolla-ansible
-    #   shell: |
-    #     cp -r /usr/local/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
-    #     cp -r /usr/local/share/kolla-ansible/ansible/inventory/* /root/inventory/
-    # - name: Modify /etc/kolla/globals.yml
-    #   lineinfile:
-    #     path: /etc/kolla/globals.yml
-    #     regexp: "{{ item.regexp }}"
-    #     line: "{{ item.line }}"
-    #   with_items:
-    #     - { regexp: '^network_interface',          line: 'network_interface:          "{{ network_interface          }}"'}
-    #     - { regexp: '^neutron_external_interface', line: 'neutron_external_interface: "{{ neutron_external_interface }}"'}
-    #     - { regexp: '^kolla_internal_vip_address', line: 'kolla_internal_vip_address: "{{ kolla_internal_vip_address }}"'}
-    # - name: Gen password for /etc/kolla/passwords.yml
-    #   command: kolla-genpwd
-    # - name: Modify /usr/local/share/kolla-ansible/init-runonce
-    #   lineinfile:
-    #     path: /usr/local/share/kolla-ansible/init-runonce
-    #     regexp: "{{ item.regexp }}"
-    #     line: "{{ item.line }}"
-    #   with_items:
-    #     - { regexp: '^EXT_NET_CIDR',    line: 'EXT_NET_CIDR="{{    ext_net_cidr    }}"'}
-    #     - { regexp: '^EXT_NET_RANGE',   line: 'EXT_NET_RANGE="{{   ext_net_range   }}"'}
-    #     - { regexp: '^EXT_NET_GATEWAY', line: 'EXT_NET_GATEWAY="{{ ext_net_gateway }}"'}
-    # - name: Modify /etc/hosts
-    #   lineinfile:
-    #     path: /etc/hosts
-    #     regexp: "^{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
-    #     line: "{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
+    - name: Install Pip Packages
+      pip:
+        name: kolla-ansible
+        version: "{{ kolla_version }}"
+    - name: Ensure the target folder existed
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - /etc/kolla
+        - /root/inventory
+    - name: Get contents from /usr/local/share/kolla-ansible
+      shell: |
+        cp -r /usr/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
+        cp -r /usr/share/kolla-ansible/ansible/inventory/* /root/inventory/
+    - name: Modify /etc/kolla/globals.yml
+      lineinfile:
+        path: /etc/kolla/globals.yml
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^network_interface',          line: 'network_interface:          "{{ network_interface          }}"'}
+        - { regexp: '^neutron_external_interface', line: 'neutron_external_interface: "{{ neutron_external_interface }}"'}
+        - { regexp: '^kolla_internal_vip_address', line: 'kolla_internal_vip_address: "{{ kolla_internal_vip_address }}"'}
+    - name: Gen password for /etc/kolla/passwords.yml
+      command: kolla-genpwd
+    - name: Modify init-runonce
+      lineinfile:
+        path: /usr/share/kolla-ansible/init-runonce
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^EXT_NET_CIDR',    line: 'EXT_NET_CIDR="{{    ext_net_cidr    }}"'}
+        - { regexp: '^EXT_NET_RANGE',   line: 'EXT_NET_RANGE="{{   ext_net_range   }}"'}
+        - { regexp: '^EXT_NET_GATEWAY', line: 'EXT_NET_GATEWAY="{{ ext_net_gateway }}"'}
+    - name: Modify /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: "^{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
+        line: "{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
