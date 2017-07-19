@@ -48,41 +48,31 @@
     - name: Display the var
       debug:
         msg: Hello {{ vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'] }}
-    # - name: Install list of packages
-    #   package:
-    #     name: "{{ item }}"
-    #     state: present
-    #   with_items:
-    #     - epel-release
-    #     - python-pip
-    #     - python-devel
-    #     - libffi-devel
-    #     - gcc
-    #     - openssl-devel
-    #     - libselinux-python
-    #     - traceroute
-    #     - ca-certificates
-    #     - ntp
-    # - name: Install Pip Packages
-    #   pip:
-    #     name: "{{ item }}"
-    #     state: present
-    #   with_items:
-    #     - pip
-    #     - ansible
-    #     - docker
-    #     - docker-py
-    #     - python-openstackclient
-
-    # - name: Ensure repository key is installed
-    #   apt_key:
-    #     id: "0EBFCD88"
-    #     url: "https://download.docker.com/linux/ubuntu/gpg"
-    #     state: present
-    # - name: Ensure docker registry is available
-    #   apt_repository:
-    #     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
-    #     state: present
+    - name: Install list of packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - epel-release
+        - python-pip
+        - python-devel
+        - libffi-devel
+        - gcc
+        - openssl-devel
+        - libselinux-python
+        - traceroute
+        - ca-certificates
+        - ntp
+    - name: Install Pip Packages
+      pip:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - pip
+        - ansible
+        - docker
+        - docker-py
+        - python-openstackclient
     - name: Ensure docker and dependencies are installed
       yum:
         list: "docker-ce"
