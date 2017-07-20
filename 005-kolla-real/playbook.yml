@@ -1,0 +1,178 @@
+---
+- hosts: all
+  sudo: yes
+
+  vars:
+    systemd_docker_config_directory: /etc/systemd/system/docker.service.d
+    network_interface:          eno2
+    neutron_external_interface: eno1
+    kolla_internal_vip_address: 192.168.103.103
+    ext_net_cidr:    192.168.0.0/22
+    ext_net_range:   start=192.168.0.218,end=192.168.0.227
+    ext_net_gateway: 192.168.0.253
+    kolla_version: 4.0.0
+    kolla_images:
+      - centos-binary-neutron-server
+      - centos-binary-nova-compute
+      - centos-binary-neutron-openvswitch-agent
+      - centos-binary-neutron-metadata-agent
+      - centos-binary-heat-api
+      - centos-binary-neutron-dhcp-agent
+      - centos-binary-neutron-l3-agent
+      - centos-binary-heat-api-cfn
+      - centos-binary-nova-ssh
+      - centos-binary-nova-placement-api
+      - centos-binary-nova-conductor
+      - centos-binary-nova-api
+      - centos-binary-nova-consoleauth
+      - centos-binary-nova-scheduler
+      - centos-binary-nova-novncproxy
+      - centos-binary-kolla-toolbox
+      - centos-binary-keystone
+      - centos-binary-glance-registry
+      - centos-binary-horizon
+      - centos-binary-haproxy
+      - centos-binary-cron
+      - centos-binary-openvswitch-db-server
+      - centos-binary-heat-engine
+      - centos-binary-glance-api
+      - centos-binary-fluentd
+      - centos-binary-nova-libvirt
+      - centos-binary-openvswitch-vswitchd
+      - centos-binary-memcached
+      - centos-binary-rabbitmq
+      - centos-binary-mariadb
+      - centos-binary-keepalived
+
+  tasks:
+    - name: Display the var
+      debug:
+        msg: Hello {{ vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'] }}
+    - name: Mirror
+      template:
+        src: sources.list.j2
+        dest: /etc/apt/sources.list
+        force: yes
+    # - name: Make sure the pip folder
+    #   file:
+    #     path: ~/.pip
+    #     state: directory
+    # - name: pip mirror
+    #   template:
+    #     src: pip.conf.j2
+    #     dest: ~/.pip/pip.conf
+    #     force: yes
+    - name: Install list of packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - python-pip
+        - python-dev
+        - libffi-dev
+        - gcc
+        - libssl-dev
+        - traceroute
+        - curl                  # for docker
+        - apt-transport-https
+        - ca-certificates
+        - software-properties-common
+        - ntp
+    - name: Install Pip Packages
+      pip:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - pip
+        - ansible
+        - docker-py
+        # - python-openstackclient
+        - docker
+    - name: Ensure repository key is installed
+      apt_key:
+        id: "0EBFCD88"
+        url: "https://download.docker.com/linux/ubuntu/gpg"
+        state: present
+    - name: Ensure docker registry is available
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+        state: present
+    - name: Ensure docker and dependencies are installed
+      package:
+        name: "docker-ce"
+        state: latest
+    - name: Ensure docker.service directory is existed
+      file:
+        path: "{{ systemd_docker_config_directory }}"
+        state: directory
+    - name: Ensure kolla.conf had contents
+      template:
+        src: kolla.conf.j2
+        dest: "{{ systemd_docker_config_directory }}/kolla.conf"
+        force: no
+    - name: Ensure docker.json had contents
+      template:
+        src: daemon.json.j2
+        dest: /etc/docker/daemon.json
+        force: no
+    - name: Restart docker systemd to take effect
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: docker
+    - name: Make sure the kolla images are present
+      docker_image:
+        state: present
+        name: "192.168.1.115:5000/kolla/{{ item }}"
+        tag: "{{ kolla_version }}"
+      with_items: "{{ kolla_images }}"
+    - name: Rename the private images to public images
+      shell: |
+        docker tag "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}" "kolla/{{ item }}:{{ kolla_version }}"
+        docker rmi "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}"
+      with_items: "{{ kolla_images }}"
+    - name: Make sure ntp is running
+      systemd:
+        state: started
+        name: ntp
+    - name: Install Pip Packages
+      pip:
+        name: kolla-ansible
+        version: "{{ kolla_version }}"
+    - name: Ensure the target folder existed
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - /etc/kolla
+        - /root/inventory
+    - name: Get contents from /usr/local/share/kolla-ansible
+      shell: |
+        cp -r /usr/local/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
+        cp -r /usr/local/share/kolla-ansible/ansible/inventory/* /root/inventory/
+    - name: Modify /etc/kolla/globals.yml
+      lineinfile:
+        path: /etc/kolla/globals.yml
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^network_interface',          line: 'network_interface:          "{{ network_interface          }}"'}
+        - { regexp: '^neutron_external_interface', line: 'neutron_external_interface: "{{ neutron_external_interface }}"'}
+        - { regexp: '^kolla_internal_vip_address', line: 'kolla_internal_vip_address: "{{ kolla_internal_vip_address }}"'}
+    - name: Gen password for /etc/kolla/passwords.yml
+      command: kolla-genpwd
+    - name: Modify /usr/local/share/kolla-ansible/init-runonce
+      lineinfile:
+        path: /usr/local/share/kolla-ansible/init-runonce
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^EXT_NET_CIDR',    line: 'EXT_NET_CIDR="{{    ext_net_cidr    }}"'}
+        - { regexp: '^EXT_NET_RANGE',   line: 'EXT_NET_RANGE="{{   ext_net_range   }}"'}
+        - { regexp: '^EXT_NET_GATEWAY', line: 'EXT_NET_GATEWAY="{{ ext_net_gateway }}"'}
+    - name: Modify /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: "^{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
+        line: "{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
