@@ -50,14 +50,13 @@
         msg: Hello {{ vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'] }}
     - name: Make sure the pip folder
       file:
-        path: ~/.pip 
+        path: ~/.pip
         state: directory
     - name: pip mirror
       template:
-	src: pip.conf.j2
+        src: pip.conf.j2
         dest: ~/.pip/pip.conf
         force: no
-        
     - name: Install list of packages
       package:
         name: "{{ item }}"
