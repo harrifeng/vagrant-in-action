@@ -10,7 +10,7 @@
     ext_net_cidr:    192.168.0.0/22
     ext_net_range:   start=192.168.0.218,end=192.168.0.227
     ext_net_gateway: 192.168.0.253
-    kolla_version: 4.0.0
+    kolla_version: 3.0.3
     kolla_images:
       - centos-binary-neutron-server
       - centos-binary-nova-compute
