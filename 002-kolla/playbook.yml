@@ -90,7 +90,7 @@
     - name: Ensure docker and dependencies are installed
       package:
         name: "docker-ce"
-        state: latest
+        state: present
     - name: Ensure docker.service directory is existed
       file:
         path: "{{ systemd_docker_config_directory }}"
@@ -105,6 +105,20 @@
         src: daemon.json.j2
         dest: /etc/docker/daemon.json
         force: yes
+    - name: Find out the vm support
+      shell: |
+        egrep -c '(vmx|svm)' /proc/cpuinfo
+      register: vm_num
+    - name: Ensure nova-compute.conf had folder
+      file:
+        path: /etc/kolla/config/nova
+        state: directory
+      when: vm_num.stdout|int == 0
+    - name: Ensure nova-compute.conf had contents
+      template:
+        src: nova-compute.conf.j2
+        dest: /etc/kolla/config/nova/nova-compute.conf
+      when: vm_num.stdout|int == 0
     - name: Restart docker systemd to take effect
       systemd:
         state: restarted
