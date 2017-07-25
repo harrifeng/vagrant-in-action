@@ -109,6 +109,7 @@
       shell: |
         egrep -c '(vmx|svm)' /proc/cpuinfo
       register: vm_num
+      ignore_errors: yes
     - name: Ensure nova-compute.conf had folder
       file:
         path: /etc/kolla/config/nova
