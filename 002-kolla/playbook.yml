@@ -48,7 +48,7 @@
   tasks:
     - name: Display the var
       debug:
-        msg: {{ vars['external_ip'] }}
+        msg: "{{ external_ip }}"
     - name: Mirror
       template:
         src: sources.list.j2
