@@ -6,10 +6,11 @@
     systemd_docker_config_directory: /etc/systemd/system/docker.service.d
     network_interface:          enp0s8
     neutron_external_interface: enp0s9
-    kolla_internal_vip_address: 172.16.0.222
-    ext_net_cidr:    10.0.0.0/24
-    ext_net_range:   start=10.0.0.100,end=10.0.0.200
-    ext_net_gateway: 10.0.0.1
+    kolla_internal_vip_address: "{{ '.'.join(vars['ansible_' + vars['network_interface']]['ipv4']['address'].split('.')[:3] + ['222']) }}"
+    external_ip: "{{ '.'.join(vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'].split('.')[:3]) }}"
+    ext_net_cidr:    "{{ external_ip }}.0/24"
+    ext_net_range:   "start={{ external_ip }}.100,end={{ external_ip }}.200"
+    ext_net_gateway: "{{ external_ip }}.1"
     kolla_version: 4.0.0
     kolla_images:
       - centos-binary-neutron-server
@@ -47,7 +48,7 @@
   tasks:
     - name: Display the var
       debug:
-        msg: Hello {{ vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'] }}
+        msg: {{ vars['external_ip'] }}
     - name: Mirror
       template:
         src: sources.list.j2
