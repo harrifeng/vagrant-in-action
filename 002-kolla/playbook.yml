@@ -143,5 +143,9 @@
     - name: Modify /etc/hosts
       lineinfile:
         path: /etc/hosts
-        regexp: "^{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
-        line: "{{ vars['ansible_' + vars['network_interface']]['ipv4']['address'] }}    {{ ansible_hostname }}"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^192.168.68.11',          line: '192.168.68.11           openstack1'}
+        - { regexp: '^192.168.68.12',          line: '192.168.68.12           openstack2'}
+        - { regexp: '^192.168.68.13',          line: '192.168.68.13           openstack3'}
