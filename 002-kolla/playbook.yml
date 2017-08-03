@@ -46,30 +46,22 @@
       - centos-binary-keepalived
 
   tasks:
-    - name: Display the var
-      debug:
-        msg: "{{ external_ip }}"
-    - name: Mirror
-      template:
-        src: sources.list.j2
-        dest: /etc/apt/sources.list
-    - name: Install list of packages
-      apt:
+   - name: Install list of packages
+      package:
         name: "{{ item }}"
         state: present
-        update_cache: yes
       with_items:
+        - epel-release
         - python-pip
-        - python-dev
-        - libffi-dev
+        - python-devel
+        - libffi-devel
         - gcc
-        - libssl-dev
+        - openssl-devel
+        - libselinux-python
         - traceroute
-        - curl                  # for docker
-        - apt-transport-https
         - ca-certificates
-        - software-properties-common
         - ntp
+        - libselinux-python
     - name: Install Pip Packages
       pip:
         name: "{{ item }}"
@@ -79,19 +71,24 @@
         - ansible
         - docker
         - python-openstackclient
-    - name: Ensure repository key is installed
-      apt_key:
-        id: "0EBFCD88"
-        url: "https://download.docker.com/linux/ubuntu/gpg"
-        state: present
-    - name: Ensure docker registry is available
-      apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
-        state: present
+    - name: Diable selinux
+      selinux:
+        state: disabled
+    - name: Make sure some service is disabled
+      systemd:
+        state: stopped
+        name: "{{ item }}"
+      with_items:
+        - firewalld
     - name: Ensure docker and dependencies are installed
-      package:
-        name: "docker-ce"
+      yum:
+        list: "docker-ce"
+      register: pkg
+    - name: Install docker rpm from a remote repo
+      yum:
+        name: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-17.06.0.ce-1.el7.centos.x86_64.rpm
         state: present
+      when: pkg.results|selectattr("yumstate", "match", "installed")|list|length == 0
     - name: Ensure docker.service directory is existed
       file:
         path: "{{ systemd_docker_config_directory }}"
@@ -129,18 +126,13 @@
     - name: Make sure the kolla images are present
       docker_image:
         state: present
-        name: "192.168.1.115:5000/kolla/{{ item }}"
+        name: "kolla/{{ item }}"
         tag: "{{ kolla_version }}"
-      with_items: "{{ kolla_images }}"
-    - name: Rename the private images to public images
-      shell: |
-        docker tag "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}" "kolla/{{ item }}:{{ kolla_version }}"
-        docker rmi "192.168.1.115:5000/kolla/{{ item }}:{{ kolla_version }}"
       with_items: "{{ kolla_images }}"
     - name: Make sure ntp is running
       systemd:
         state: started
-        name: ntp
+        name: ntpd
     - name: Install Pip Packages
       pip:
         name: kolla-ansible
@@ -165,6 +157,9 @@
         - { regexp: '^network_interface',          line: 'network_interface:          "{{ network_interface          }}"'}
         - { regexp: '^neutron_external_interface', line: 'neutron_external_interface: "{{ neutron_external_interface }}"'}
         - { regexp: '^kolla_internal_vip_address', line: 'kolla_internal_vip_address: "{{ kolla_internal_vip_address }}"'}
+        - { regexp: '^keystone_admin_password',    line: 'keystone_admin_password: welcome'}
+        - { regexp: '^openstack_release',          line: 'openstack_release: 4.0.0'}
+        - { regexp: '^docker_registry',            line: 'docker_registry: 192.168.1.115:5000'}
     - name: Gen password for /etc/kolla/passwords.yml
       command: kolla-genpwd
     - name: Modify /usr/local/share/kolla-ansible/init-runonce
