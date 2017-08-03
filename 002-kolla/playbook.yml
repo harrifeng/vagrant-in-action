@@ -4,47 +4,14 @@
 
   vars:
     systemd_docker_config_directory: /etc/systemd/system/docker.service.d
-    network_interface:          enp0s8
-    neutron_external_interface: enp0s9
+    network_interface:          enp0s3
+    neutron_external_interface: enp0s8
     kolla_internal_vip_address: "{{ '.'.join(vars['ansible_' + vars['network_interface']]['ipv4']['address'].split('.')[:3] + ['222']) }}"
     external_ip: "{{ '.'.join(vars['ansible_' + vars['neutron_external_interface']]['ipv4']['address'].split('.')[:3]) }}"
     ext_net_cidr:    "{{ external_ip }}.0/24"
     ext_net_range:   "start={{ external_ip }}.100,end={{ external_ip }}.200"
     ext_net_gateway: "{{ external_ip }}.1"
-    kolla_version: 4.0.0
-    # kolla_images:
-    #   - centos-binary-neutron-server
-    #   - centos-binary-nova-compute
-    #   - centos-binary-neutron-openvswitch-agent
-    #   - centos-binary-neutron-metadata-agent
-    #   - centos-binary-heat-api
-    #   - centos-binary-neutron-dhcp-agent
-    #   - centos-binary-neutron-l3-agent
-    #   - centos-binary-heat-api-cfn
-    #   - centos-binary-nova-ssh
-    #   - centos-binary-nova-placement-api
-    #   - centos-binary-nova-conductor
-    #   - centos-binary-nova-api
-    #   - centos-binary-nova-consoleauth
-    #   - centos-binary-nova-scheduler
-    #   - centos-binary-nova-novncproxy
-    #   - centos-binary-kolla-toolbox
-    #   - centos-binary-keystone
-    #   - centos-binary-glance-registry
-    #   - centos-binary-horizon
-    #   - centos-binary-haproxy
-    #   - centos-binary-cron
-    #   - centos-binary-openvswitch-db-server
-    #   - centos-binary-heat-engine
-    #   - centos-binary-glance-api
-    #   - centos-binary-fluentd
-    #   - centos-binary-nova-libvirt
-    #   - centos-binary-openvswitch-vswitchd
-    #   - centos-binary-memcached
-    #   - centos-binary-rabbitmq
-    #   - centos-binary-mariadb
-    #   - centos-binary-keepalived
-
+    kolla_version: 4.0.3
   tasks:
     - name: Install list of packages
       package:
@@ -70,7 +37,6 @@
         - pip
         - ansible
         - docker
-        # - python-openstackclient
     - name: Diable selinux
       selinux:
         state: disabled
@@ -133,8 +99,11 @@
         name: ntpd
     - name: Install Pip Packages
       pip:
-        name: kolla-ansible
-        version: "{{ kolla_version }}"
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - kolla-ansible
+        - python-openstackclient
     - name: Ensure the target folder existed
       file:
         path: "{{ item }}"
@@ -158,8 +127,8 @@
         - { regexp: '^keystone_admin_password',    line: 'keystone_admin_password: welcome'}
         - { regexp: '^openstack_release',          line: 'openstack_release: 4.0.0'}
         - { regexp: '^docker_registry',            line: 'docker_registry: 192.168.1.115:5000'}
-        - { regexp: '^docker_namespace',           line: 'docker_namespace: kolla'}
-        - { regexp: '^kolla_install_type',         line: 'kolla_install_type: binary'}
+        - { regexp: '^docker_namespace',           line: 'docker_namespace: lokolla'}
+        - { regexp: '^kolla_install_type',         line: 'kolla_install_type: source'}
 
     - name: Gen password for /etc/kolla/passwords.yml
       command: kolla-genpwd
