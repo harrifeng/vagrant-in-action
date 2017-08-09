@@ -1,13 +1,14 @@
-# Require the reboot plugin.
+# Require the reboot plugin. selinux need to reboot to make sure it is closed
 require './vagrant-provision-reboot-plugin'
 Vagrant.configure("2") do |config|
-  config.vm.provider "virtualbox" do |vb|
-    vb.gui = false
-    vb.memory = "10240"
-    vb.cpus = 4
-  end
 
   config.vm.define "kolla-aio" do |app|
+    app.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+      vb.memory = "10240"
+      vb.cpus = 4
+    end
+
     app.vm.hostname = "kolla-aio"
     app.vm.box = "hfeng/centos-7"
     app.vm.box_check_update = false
