@@ -30,5 +30,35 @@
     - name: Make sure docker is running
       systemd:
         state: started
-        daemon_reload: yes
         name: docker
+    - name: Make sure the directory for docker image is existed
+      file:
+        path: /opt/registry
+        state: directory
+    - name: docker image centos-binary-registry-ocata.tar.gz is existed
+      stat:
+        path: /vagrant/centos-binary-registry-ocata.tar.gz
+      register: st
+    - name: Download the image file
+      get_url:
+        url: http://tarballs.openstack.org/kolla/images/centos-binary-registry-ocata.tar.gz
+        dest: /vagrant/centos-binary-registry-ocata.tar.gz
+      when: not st.stat.exists
+    - name: unzip the file to /opt/registry
+      shell: |
+        tar zxvf /vagrant/centos-binary-registry-ocata.tar.gz -C /opt/registry/
+      when: not st.stat.exists
+    - name: Debug the image_tar
+      debug:
+        msg: "{{ st }}"
+      when: st.stat.exists
+    - name: Make sure the registry2 is running
+      docker_container:
+        name: registry
+        state: present
+        image: registry:2
+        reestart_policy: always
+        ports:
+          - "5000:5000"
+        volumes:
+          - "/opt/registry:/var/lib/registry"
