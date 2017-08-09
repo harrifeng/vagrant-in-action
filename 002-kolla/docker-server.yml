@@ -31,33 +31,33 @@
       systemd:
         state: started
         name: docker
-    - name: Make sure the directory for docker image is existed
-      file:
-        path: /opt/registry
-        state: directory
+    # - name: Make sure the directory for docker image is existed
+    #   file:
+    #     path: /opt/registry
+    #     state: directory
+    - name: registry repo folder existance judge
+      stat:
+        path: /opt/registry/docker/registry/v2/repositories/lokolla
+      register: repo_st
     - name: docker image centos-binary-registry-ocata.tar.gz is existed
       stat:
         path: /vagrant/centos-binary-registry-ocata.tar.gz
-      register: st
+      register: gz_st
     - name: Download the image file
       get_url:
         url: http://tarballs.openstack.org/kolla/images/centos-binary-registry-ocata.tar.gz
         dest: /vagrant/centos-binary-registry-ocata.tar.gz
-      when: not st.stat.exists
+      when: not ( gz_st.stat.exists  and repo_st.stat.exists)
     - name: unzip the file to /opt/registry
       shell: |
         tar zxvf /vagrant/centos-binary-registry-ocata.tar.gz -C /opt/registry/
-      when: not st.stat.exists
-    - name: Debug the image_tar
-      debug:
-        msg: "{{ st }}"
-      when: st.stat.exists
+      when: not repo_st.stat.exists
     - name: Make sure the registry2 is running
       docker_container:
         name: registry
-        state: present
+        state: started
         image: registry:2
-        reestart_policy: always
+        restart_policy: always
         ports:
           - "5000:5000"
         volumes:
