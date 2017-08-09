@@ -89,7 +89,8 @@
       when: vm_num.stdout|int == 0
     - name: Restart docker systemd to take effect
       systemd:
-        state: restarted
+        state: started
+        enabled: yes
         daemon_reload: yes
         name: docker
     - name: Make sure ntp is running
