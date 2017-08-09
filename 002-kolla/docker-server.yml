@@ -1,0 +1,34 @@
+---
+- hosts: all
+  sudo: yes
+
+  tasks:
+    - name: Install list of packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - epel-release
+        - python-pip
+        - python-devel
+    - name: Install Pip Packages
+      pip:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - pip
+        - docker
+    - name: Ensure docker and dependencies are installed
+      yum:
+        list: "docker-ce"
+      register: pkg
+    - name: Install docker rpm from a remote repo
+      yum:
+        name: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-17.06.0.ce-1.el7.centos.x86_64.rpm
+        state: present
+      when: pkg.results|selectattr("yumstate", "match", "installed")|list|length == 0
+    - name: Make sure docker is running
+      systemd:
+        state: started
+        daemon_reload: yes
+        name: docker
