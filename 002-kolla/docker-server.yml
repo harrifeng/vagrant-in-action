@@ -31,10 +31,10 @@
       systemd:
         state: started
         name: docker
-    # - name: Make sure the directory for docker image is existed
-    #   file:
-    #     path: /opt/registry
-    #     state: directory
+    - name: Make sure the directory for docker image is existed
+      file:
+        path: /opt/registry
+        state: directory
     - name: registry repo folder existance judge
       stat:
         path: /opt/registry/docker/registry/v2/repositories/lokolla
