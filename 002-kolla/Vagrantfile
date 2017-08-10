@@ -10,6 +10,13 @@ Vagrant.configure("2") do |config|
     end
     app.vm.hostname = "docker-server"
     app.vm.box = "bento/centos-7.3"
+    if Vagrant.has_plugin?("vagrant-cachier")
+      config.cache.scope = :box
+      config.cache.synced_folder_opts = {
+        type: :nfs,
+        mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+      }
+    end
     app.vm.box_check_update = false
     app.ssh.insert_key = false
     app.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key']
@@ -31,6 +38,13 @@ Vagrant.configure("2") do |config|
 
     app.vm.hostname = "kolla-aio"
     app.vm.box = "bento/centos-7.3"
+    if Vagrant.has_plugin?("vagrant-cachier")
+      config.cache.scope = :box
+      config.cache.synced_folder_opts = {
+        type: :nfs,
+        mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+      }
+    end
     app.vm.box_check_update = false
     app.ssh.insert_key = false
     app.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key']
