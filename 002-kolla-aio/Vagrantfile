@@ -1,5 +1,21 @@
 # Require the reboot plugin. selinux need to reboot to make sure it is closed
 require './vagrant-provision-reboot-plugin'
+
+arr = %w(
+docker-ce-17.06.0.ce-1.el7.centos.x86_64.rpm
+https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-17.06.0.ce-1.el7.centos.x86_64.rpm
+centos-binary-registry-ocata.tar.gz
+http://tarballs.openstack.org/kolla/images/centos-binary-registry-ocata.tar.gz
+)
+need_files = Hash[*arr]
+ret = need_files.keys.map do |k|
+  if File.exists?(File.expand_path "./#{k}")
+    puts "#{k} File already here"
+  else
+    system "wget  #{need_files[k]}"
+  end
+end
+
 Vagrant.configure("2") do |config|
 
   config.vm.define "docker-server" do |app|
