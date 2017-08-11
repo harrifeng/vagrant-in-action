@@ -51,7 +51,7 @@
       register: pkg
     - name: Install docker rpm from a remote repo
       yum:
-        name: ./docker-ce-17.06.0.ce-1.el7.centos.x86_64.rpm
+        name: /vagrant/docker-ce-17.06.0.ce-1.el7.centos.x86_64.rpm
         state: present
       when: pkg.results|selectattr("yumstate", "match", "installed")|list|length == 0
     - name: Ensure docker.service directory is existed
