@@ -28,6 +28,15 @@
         - ca-certificates
         - ntp
         - libselinux-python
+    - name: Make sure the pip folder
+      file:
+        path: ~/.pip
+        state: directory
+    - name: pip mirror
+      template:
+        src: pip.conf.j2
+        dest: ~/.pip/pip.conf
+        force: yes
     - name: Install Pip Packages
       pip:
         name: "{{ item }}"
