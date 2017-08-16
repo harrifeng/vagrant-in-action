@@ -162,5 +162,5 @@
         regexp: "{{ item.regexp }}"
         line: "{{ item.line }}"
       with_items:
-        - { regexp: '^"{{ controller_internal_ip }} kolla-multi-controller"',    line: '"{{ controller_internal_ip }} kolla-multi-controller"'}
-        - { regexp: '^"{{ repo_internal_ip }} kolla-multi-repo"',                line: '"{{ repo_internal_ip }} kolla-multi-repo"'}
+        - { regexp: '^"{{ controller_internal_ip }} kolla-multi-controller"',    line: '{{ controller_internal_ip }} kolla-multi-controller'}
+        - { regexp: '^"{{ repo_internal_ip }} kolla-multi-repo"',                line: '{{ repo_internal_ip }} kolla-multi-repo'}
