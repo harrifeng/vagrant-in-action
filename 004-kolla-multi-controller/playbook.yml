@@ -154,3 +154,10 @@
         - { regexp: '^EXT_NET_RANGE',   line: 'EXT_NET_RANGE="{{   ext_net_range   }}"'}
         - { regexp: '^EXT_NET_GATEWAY', line: 'EXT_NET_GATEWAY="{{ ext_net_gateway }}"'}
         - { regexp: 'ssh-keygen -t rsa -f ~/.ssh/id_rsa', line: '    ssh-keygen -t rsa -f ~/.ssh/id_rsa -N "" '}
+    - name: Modify /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^"{{ controller_internal_ip }} {{ controller_hostname }}"',    line: '"{{ controller_internal_ip }} {{ controller_hostname }}"'}
