@@ -3,6 +3,8 @@
   sudo: yes
 
   vars:
+    controller_internal_ip: 10.0.77.10
+    repo_internal_ip: 10.0.77.111
     systemd_docker_config_directory: /etc/systemd/system/docker.service.d
     network_interface:          enp0s8
     neutron_external_interface: enp0s9
@@ -160,4 +162,5 @@
         regexp: "{{ item.regexp }}"
         line: "{{ item.line }}"
       with_items:
-        - { regexp: '^"{{ controller_internal_ip }} {{ controller_hostname }}"',    line: '"{{ controller_internal_ip }} {{ controller_hostname }}"'}
+        - { regexp: '^"{{ controller_internal_ip }} kolla-multi-controller"',    line: '"{{ controller_internal_ip }} kolla-multi-controller"'}
+        - { regexp: '^"{{ repo_internal_ip }} kolla-multi-repo"',                line: '"{{ repo_internal_ip }} kolla-multi-repo"'}
